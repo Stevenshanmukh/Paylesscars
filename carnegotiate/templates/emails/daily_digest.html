@@ -1,0 +1,27 @@
+{% extends "emails/base.html" %}
+{% block title %}Your Daily Digest{% endblock %}
+
+{% block content %}
+<h1 class="greeting">Your CarNegotiate Daily Digest</h1>
+
+<p class="message">
+    You have <strong>{{ unread_count }}</strong> unread notification{{ unread_count|pluralize }} waiting for you.
+</p>
+
+<div class="highlight-box">
+    <div class="label">Summary</div>
+    <div style="margin-top: 10px; color: #1e293b;">
+        Don't miss out on important offers and updates. Log in to see what's happening with your negotiations.
+    </div>
+</div>
+
+<p style="text-align: center;">
+    <a href="{{ site_url }}/dashboard" class="cta-button">
+        View All Notifications
+    </a>
+</p>
+
+<p class="message" style="margin-top: 30px; font-size: 14px; color: #94a3b8; text-align: center;">
+    You can turn off daily digest emails in your notification preferences.
+</p>
+{% endblock %}

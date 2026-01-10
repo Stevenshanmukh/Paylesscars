@@ -1,0 +1,29 @@
+{% extends "emails/base.html" %}
+{% block title %}Counter Offer Received{% endblock %}
+
+{% block content %}
+<h1 class="greeting">You've received a counter offer!</h1>
+
+<p class="message">
+    The negotiation on the {{ vehicle_title }} is progressing. A new counter offer has been submitted.
+</p>
+
+<div class="highlight-box">
+    <div class="label">Counter Offer</div>
+    <div class="value">${{ offer_amount|floatformat:"0"|intcomma }}</div>
+</div>
+
+<div class="vehicle-card">
+    <div class="title">{{ vehicle_title }}</div>
+</div>
+
+<p class="message">
+    You have 72 hours to respond. You can accept this offer, submit a counter, or walk away.
+</p>
+
+<p style="text-align: center;">
+    <a href="{{ site_url }}/negotiations/{{ negotiation_id }}" class="cta-button">
+        View & Respond
+    </a>
+</p>
+{% endblock %}

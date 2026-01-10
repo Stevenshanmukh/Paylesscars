@@ -1,0 +1,31 @@
+{% extends "emails/base.html" %}
+{% block title %}Verification Update{% endblock %}
+
+{% block content %}
+<h1 class="greeting">Verification Update</h1>
+
+<p class="message">
+    Thank you for your interest in joining CarNegotiate as a dealer. Unfortunately, we weren't able to verify your
+    dealership at this time.
+</p>
+
+{% if reason %}
+<div class="highlight-box" style="border-left-color: #ef4444; background: #fef2f2;">
+    <div class="label">Reason</div>
+    <div style="margin-top: 10px; color: #1e293b;">
+        {{ reason }}
+    </div>
+</div>
+{% endif %}
+
+<p class="message">
+    If you believe this was an error or would like to provide additional documentation, please contact our dealer
+    support team.
+</p>
+
+<p style="text-align: center;">
+    <a href="mailto:dealers@carnegotiate.com" class="secondary-button">
+        Contact Dealer Support
+    </a>
+</p>
+{% endblock %}

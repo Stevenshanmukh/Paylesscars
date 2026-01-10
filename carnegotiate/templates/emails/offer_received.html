@@ -1,0 +1,33 @@
+{% extends "emails/base.html" %}
+{% block title %}New Offer Received{% endblock %}
+
+{% block content %}
+<h1 class="greeting">New offer on your {{ vehicle_title }}!</h1>
+
+<p class="message">
+    Great news! A buyer has submitted an offer on your vehicle listing.
+</p>
+
+<div class="highlight-box">
+    <div class="label">Offer Amount</div>
+    <div class="value">${{ offer_amount|floatformat:"0"|intcomma }}</div>
+</div>
+
+<div class="vehicle-card">
+    <div class="title">{{ vehicle_title }}</div>
+</div>
+
+<p class="message">
+    You have 72 hours to respond to this offer. You can accept, counter, or reject it.
+</p>
+
+<p style="text-align: center;">
+    <a href="{{ site_url }}/negotiations/{{ negotiation_id }}" class="cta-button">
+        View Offer & Respond
+    </a>
+</p>
+
+<p class="message" style="margin-top: 30px; font-size: 14px; color: #94a3b8;">
+    Tip: Quick responses lead to higher conversion rates! 🚀
+</p>
+{% endblock %}

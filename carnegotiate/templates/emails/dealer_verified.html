@@ -1,0 +1,33 @@
+{% extends "emails/base.html" %}
+{% block title %}Dealership Verified{% endblock %}
+
+{% block content %}
+<h1 class="greeting">🎉 Welcome to CarNegotiate!</h1>
+
+<p class="message" style="font-size: 18px;">
+    <strong>Your dealership has been verified!</strong>
+</p>
+
+<p class="message">
+    Congratulations! Your dealership is now verified and you can start listing vehicles on CarNegotiate.
+</p>
+
+<div class="highlight-box" style="border-left-color: #22c55e; background: #f0fdf4;">
+    <div class="label">What's Next</div>
+    <div style="margin-top: 10px; color: #1e293b;">
+        <p style="margin-bottom: 8px;">✅ Add your first vehicle listing</p>
+        <p style="margin-bottom: 8px;">✅ Set competitive pricing</p>
+        <p style="margin-bottom: 8px;">✅ Start receiving offers from buyers</p>
+    </div>
+</div>
+
+<p style="text-align: center;">
+    <a href="{{ site_url }}/dealer/inventory/new" class="cta-button" style="background: #22c55e;">
+        Add Your First Vehicle
+    </a>
+</p>
+
+<p class="message" style="margin-top: 30px; text-align: center;">
+    Need help? Our dealer success team is here to help you succeed!
+</p>
+{% endblock %}

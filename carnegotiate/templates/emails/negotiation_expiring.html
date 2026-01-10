@@ -1,0 +1,25 @@
+{% extends "emails/base.html" %}
+{% block title %}Action Needed: Negotiation Expiring Soon{% endblock %}
+
+{% block content %}
+<h1 class="greeting">⏰ Action Required</h1>
+
+<p class="message" style="font-size: 18px; color: #f97316;">
+    Your negotiation is expiring soon!
+</p>
+
+<div class="highlight-box" style="border-left-color: #f97316; background: #fff7ed;">
+    <div class="label">Time Remaining</div>
+    <div class="value" style="color: #f97316;">~{{ hours_remaining }} hours</div>
+</div>
+
+<p class="message">
+    There's an offer waiting for your response. If you don't respond in time, the negotiation will automatically expire.
+</p>
+
+<p style="text-align: center;">
+    <a href="{{ site_url }}/negotiations/{{ negotiation_id }}" class="cta-button" style="background: #f97316;">
+        Respond Now
+    </a>
+</p>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "emails/base.html" %}
+{% block title %}Negotiation Expired{% endblock %}
+
+{% block content %}
+<h1 class="greeting">Negotiation Expired</h1>
+
+<p class="message">
+    Unfortunately, the negotiation on the vehicle below has expired due to no response within the time limit.
+</p>
+
+<div class="vehicle-card">
+    <div class="title">{{ vehicle_title }}</div>
+</div>
+
+<p class="message">
+    Don't worry! The vehicle may still be available. You can start a new negotiation if you're still interested.
+</p>
+
+<p style="text-align: center;">
+    <a href="{{ site_url }}/vehicles" class="cta-button">
+        Browse Vehicles
+    </a>
+</p>
+{% endblock %}

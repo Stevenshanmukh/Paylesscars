@@ -1,0 +1,30 @@
+{% extends "emails/base.html" %}
+{% block title %}Offer Update{% endblock %}
+
+{% block content %}
+<h1 class="greeting">Offer Update</h1>
+
+<p class="message">
+    Unfortunately, the dealer was unable to accept your offer on the {{ vehicle_title }}.
+</p>
+
+<div class="vehicle-card">
+    <div class="title">{{ vehicle_title }}</div>
+</div>
+
+{% if reason %}
+<p class="message">
+    <strong>Reason:</strong> {{ reason }}
+</p>
+{% endif %}
+
+<p class="message">
+    Don't give up! There are thousands of other great vehicles waiting for you on CarNegotiate.
+</p>
+
+<p style="text-align: center;">
+    <a href="{{ site_url }}/vehicles" class="cta-button">
+        Browse More Vehicles
+    </a>
+</p>
+{% endblock %}

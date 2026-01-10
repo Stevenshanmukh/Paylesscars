@@ -1,0 +1,12 @@
+# CarNegotiate - Production Requirements
+
+-r base.txt
+
+# Monitoring & Logging
+sentry-sdk>=1.38,<2.0
+
+# Security
+django-csp>=3.7,<4.0
+
+# Performance
+django-redis>=5.4,<6.0
