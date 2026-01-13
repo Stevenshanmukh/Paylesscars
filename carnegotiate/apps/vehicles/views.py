@@ -117,11 +117,15 @@ class VehicleViewSet(viewsets.ModelViewSet):
         serializer = VehicleListSerializer(vehicles, many=True)
         return Response({'results': serializer.data})
     
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def upload_images(self, request, pk=None):
+        """Upload images for a vehicle."""
         print(f"DEBUG: upload_images called for vehicle {pk}")
         try:
             from .models import VehicleImage
             from .tasks import process_vehicle_image
             from django.conf import settings
+
             
             vehicle = self.get_object()
             
