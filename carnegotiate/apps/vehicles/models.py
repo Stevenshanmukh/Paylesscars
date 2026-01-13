@@ -116,17 +116,29 @@ class Vehicle(TimeStampedModel):
 class VehicleImage(TimeStampedModel):
     """
     Images for vehicle listings.
+    Supports multiple size variants for performance.
     """
     vehicle = models.ForeignKey(
         Vehicle,
         on_delete=models.CASCADE,
         related_name='images'
     )
+    # Original uploaded image
     image = models.ImageField(upload_to='vehicles/')
+    
+    # Generated variants (created by Celery task)
+    thumbnail = models.ImageField(upload_to='vehicles/thumbs/', blank=True)
+    medium = models.ImageField(upload_to='vehicles/medium/', blank=True)
+    large = models.ImageField(upload_to='vehicles/large/', blank=True)
+    
+    # URL fields for CDN/external storage (future use)
     thumbnail_url = models.URLField(blank=True)
     medium_url = models.URLField(blank=True)
     large_url = models.URLField(blank=True)
+    
+    # Metadata
     is_primary = models.BooleanField(default=False)
+    is_processed = models.BooleanField(default=False)
     display_order = models.PositiveSmallIntegerField(default=0)
     alt_text = models.CharField(max_length=255, blank=True)
     

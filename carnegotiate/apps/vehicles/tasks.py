@@ -9,70 +9,91 @@ from django.core.files.base import ContentFile
 import os
 
 
+# Image size configurations
+IMAGE_SIZES = {
+    'thumbnail': (400, 300),    # For listings/cards
+    'medium': (800, 600),       # For detail views
+    'large': (1920, 1080),      # For galleries/zoom
+}
+
+
 @shared_task
 def process_vehicle_image(image_id: str):
     """
     Process a vehicle image:
     - Resize to optimal dimensions
-    - Create thumbnail
-    - Optimize for web
+    - Create thumbnail, medium, and large variants
+    - Optimize for web (JPEG quality 85)
     """
     from .models import VehicleImage
     
     try:
         vehicle_image = VehicleImage.objects.get(pk=image_id)
     except VehicleImage.DoesNotExist:
-        return
+        return f"Image {image_id} not found"
     
     if not vehicle_image.image:
-        return
+        return f"Image {image_id} has no file"
+    
+    if vehicle_image.is_processed:
+        return f"Image {image_id} already processed"
     
     try:
-        # Open image
+        # Open original image
         img = Image.open(vehicle_image.image)
         
-        # Convert to RGB if necessary
+        # Convert to RGB if necessary (for PNG with transparency, etc.)
         if img.mode in ('RGBA', 'P'):
             img = img.convert('RGB')
         
-        # Resize main image (max 1920x1080)
-        max_size = (1920, 1080)
-        img.thumbnail(max_size, Image.Resampling.LANCZOS)
+        original_filename = os.path.basename(vehicle_image.image.name)
+        name_without_ext = os.path.splitext(original_filename)[0]
         
-        # Save optimized main image
-        buffer = BytesIO()
-        img.save(buffer, format='JPEG', quality=85, optimize=True)
-        buffer.seek(0)
-        
-        # Replace original with optimized version
-        filename = os.path.basename(vehicle_image.image.name)
-        vehicle_image.image.save(
-            filename,
-            ContentFile(buffer.read()),
+        # Generate large variant (main display image)
+        large_img = img.copy()
+        large_img.thumbnail(IMAGE_SIZES['large'], Image.Resampling.LANCZOS)
+        large_buffer = BytesIO()
+        large_img.save(large_buffer, format='JPEG', quality=85, optimize=True)
+        large_buffer.seek(0)
+        vehicle_image.large.save(
+            f"{name_without_ext}_large.jpg",
+            ContentFile(large_buffer.read()),
             save=False
         )
         
-        # Create thumbnail (400x300)
-        thumb_size = (400, 300)
-        img.thumbnail(thumb_size, Image.Resampling.LANCZOS)
+        # Generate medium variant
+        medium_img = img.copy()
+        medium_img.thumbnail(IMAGE_SIZES['medium'], Image.Resampling.LANCZOS)
+        medium_buffer = BytesIO()
+        medium_img.save(medium_buffer, format='JPEG', quality=85, optimize=True)
+        medium_buffer.seek(0)
+        vehicle_image.medium.save(
+            f"{name_without_ext}_medium.jpg",
+            ContentFile(medium_buffer.read()),
+            save=False
+        )
         
+        # Generate thumbnail
+        thumb_img = img.copy()
+        thumb_img.thumbnail(IMAGE_SIZES['thumbnail'], Image.Resampling.LANCZOS)
         thumb_buffer = BytesIO()
-        img.save(thumb_buffer, format='JPEG', quality=80, optimize=True)
+        thumb_img.save(thumb_buffer, format='JPEG', quality=80, optimize=True)
         thumb_buffer.seek(0)
-        
-        # Save thumbnail
-        thumb_filename = f"thumb_{filename}"
         vehicle_image.thumbnail.save(
-            thumb_filename,
+            f"{name_without_ext}_thumb.jpg",
             ContentFile(thumb_buffer.read()),
             save=False
         )
         
+        # Mark as processed
         vehicle_image.is_processed = True
         vehicle_image.save()
         
+        return f"Successfully processed image {image_id}"
+        
     except Exception as e:
         print(f"Error processing image {image_id}: {e}")
+        return f"Error: {e}"
 
 
 @shared_task
@@ -86,15 +107,19 @@ def bulk_process_dealer_images(dealer_id: str):
     try:
         dealer = Dealer.objects.get(pk=dealer_id)
     except Dealer.DoesNotExist:
-        return
+        return f"Dealer {dealer_id} not found"
     
     unprocessed = VehicleImage.objects.filter(
         vehicle__dealer=dealer,
         is_processed=False
     )
     
+    count = 0
     for image in unprocessed:
         process_vehicle_image.delay(str(image.id))
+        count += 1
+    
+    return f"Queued {count} images for processing"
 
 
 @shared_task
@@ -117,15 +142,15 @@ def cleanup_orphaned_images():
     
     count = 0
     for image in orphaned:
-        # Delete the actual file
-        if image.image:
-            image.image.delete(save=False)
-        if image.thumbnail:
-            image.thumbnail.delete(save=False)
+        # Delete all image files
+        for field_name in ['image', 'thumbnail', 'medium', 'large']:
+            field = getattr(image, field_name)
+            if field:
+                field.delete(save=False)
         image.delete()
         count += 1
     
-    return count
+    return f"Cleaned up {count} orphaned images"
 
 
 @shared_task
@@ -136,11 +161,12 @@ def generate_vehicle_report(dealer_id: str):
     from apps.dealers.models import Dealer
     from .models import Vehicle
     from django.db.models import Avg, Count, Sum
+    from django.utils import timezone
     
     try:
         dealer = Dealer.objects.get(pk=dealer_id)
     except Dealer.DoesNotExist:
-        return
+        return None
     
     vehicles = Vehicle.objects.filter(dealer=dealer)
     
@@ -185,7 +211,7 @@ def decode_vin_async(vehicle_id: str):
     try:
         vehicle = Vehicle.objects.get(pk=vehicle_id)
     except Vehicle.DoesNotExist:
-        return
+        return None
     
     decoded = VehicleService.decode_vin(vehicle.vin)
     
@@ -215,7 +241,5 @@ def decode_vin_async(vehicle_id: str):
         
         if update_fields:
             vehicle.save(update_fields=update_fields)
-
-
-# Import timezone at the end to avoid issues
-from django.utils import timezone
+    
+    return decoded

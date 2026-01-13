@@ -117,37 +117,133 @@ class VehicleViewSet(viewsets.ModelViewSet):
         serializer = VehicleListSerializer(vehicles, many=True)
         return Response({'results': serializer.data})
     
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
-    def upload_images(self, request, pk=None):
-        """Upload images for a vehicle."""
+        print(f"DEBUG: upload_images called for vehicle {pk}")
+        try:
+            from .models import VehicleImage
+            from .tasks import process_vehicle_image
+            from django.conf import settings
+            
+            vehicle = self.get_object()
+            
+            files = request.FILES.getlist('images')
+            primary_index = int(request.data.get('primary_index', 0))
+            
+            if not files:
+                return Response(
+                    {'detail': 'No images provided'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            images = []
+            existing_count = vehicle.images.count()
+            
+            for i, file in enumerate(files):
+                # Set as primary if explicitly requested or first image of vehicle
+                is_primary = (i == primary_index) if existing_count == 0 else False
+                
+                image = VehicleImage.objects.create(
+                    vehicle=vehicle,
+                    image=file,
+                    is_primary=is_primary,
+                    display_order=existing_count + i,
+                    alt_text=f"{vehicle} - Image {existing_count + i + 1}"
+                )
+                
+                # Trigger async image processing for thumbnails/variants
+                try:
+                    # In development/debug mode, run synchronously to avoid Redis dependency
+                    if settings.DEBUG:
+                        process_vehicle_image(str(image.id))
+                        print(f"DEBUG: Processed image {image.id} synchronously")
+                    else:
+                        process_vehicle_image.delay(str(image.id))
+                except Exception as task_error:
+                    print(f"DEBUG: Task trigger FAILED: {task_error}")
+                    # Don't fail the upload just because processing failed
+                
+                images.append({
+                    'id': str(image.id),
+                    'url': image.image.url if image.image else None,
+                    'is_primary': image.is_primary
+                })
+            
+            return Response({'images': images}, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            print(f"DEBUG: CRITICAL ERROR in upload_images: {e}")
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {'detail': f'Server error: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @action(
+        detail=True, 
+        methods=['delete'], 
+        url_path='images/(?P<image_id>[^/.]+)',
+        permission_classes=[IsAuthenticated]
+    )
+    def delete_image(self, request, pk=None, image_id=None):
+        """Delete a specific image from a vehicle."""
         from .models import VehicleImage
+        from .services import VehicleService
         
         vehicle = self.get_object()
-        files = request.FILES.getlist('images')
-        
-        if not files:
+        try:
+            image = vehicle.images.get(id=image_id)
+            VehicleService.delete_image(image)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except VehicleImage.DoesNotExist:
             return Response(
-                {'detail': 'No images provided'},
+                {'detail': 'Image not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    @action(
+        detail=True, 
+        methods=['post'], 
+        url_path='images/reorder',
+        permission_classes=[IsAuthenticated]
+    )
+    def reorder_images(self, request, pk=None):
+        """Reorder vehicle images. Expects JSON body: {"image_ids": ["id1", "id2", ...]}"""
+        from .services import VehicleService
+        
+        vehicle = self.get_object()
+        image_ids = request.data.get('image_ids', [])
+        
+        if not image_ids:
+            return Response(
+                {'detail': 'image_ids array required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        images = []
-        for i, file in enumerate(files):
-            is_primary = i == 0 and not vehicle.images.exists()
-            image = VehicleImage.objects.create(
-                vehicle=vehicle,
-                image=file,
-                is_primary=is_primary,
-                display_order=vehicle.images.count() + i,
-                alt_text=f"{vehicle} - Image {vehicle.images.count() + i + 1}"
-            )
-            images.append({
-                'id': str(image.id),
-                'url': image.image.url if image.image else None,
-                'is_primary': image.is_primary
-            })
+        VehicleService.reorder_images(vehicle, image_ids)
+        return Response({'detail': 'Images reordered successfully'})
+    
+    @action(
+        detail=True, 
+        methods=['post'], 
+        url_path='images/(?P<image_id>[^/.]+)/set-primary',
+        permission_classes=[IsAuthenticated]
+    )
+    def set_primary_image(self, request, pk=None, image_id=None):
+        """Set a specific image as the primary image."""
+        from .models import VehicleImage
+        from .services import VehicleService
         
-        return Response({'images': images}, status=status.HTTP_201_CREATED)
+        vehicle = self.get_object()
+        try:
+            image = vehicle.images.get(id=image_id)
+            VehicleService.set_primary_image(image)
+            return Response({'detail': 'Primary image updated'})
+        except VehicleImage.DoesNotExist:
+            return Response(
+                {'detail': 'Image not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
     
     @action(detail=False, methods=['post'], parser_classes=[MultiPartParser, FormParser])
     def bulk_upload(self, request):
@@ -220,6 +316,16 @@ class VehicleViewSet(viewsets.ModelViewSet):
 
                 # Create vehicle
                 vehicle = Vehicle.objects.create(**vehicle_data)
+                
+                # Handle image URL if provided
+                image_url = row.get('image_url', '').strip()
+                if image_url:
+                    try:
+                        self._download_and_attach_image(vehicle, image_url)
+                    except Exception as img_err:
+                        print(f"Failed to download image for {vehicle.vin}: {img_err}")
+                        # Continue even if image fails - log but don't fail vehicle creation
+                
                 results['successful'] += 1
                 results['created_vehicles'].append({
                     'id': vehicle.id,
@@ -353,6 +459,43 @@ class VehicleViewSet(viewsets.ModelViewSet):
             'status': vehicle_status,
         }
 
+    def _download_and_attach_image(self, vehicle, image_url: str):
+        """Download an image from URL and attach it to a vehicle."""
+        import requests
+        from django.core.files.base import ContentFile
+        from .models import VehicleImage
+        from .tasks import process_vehicle_image
+        import os
+        from urllib.parse import urlparse
+
+        try:
+            # Download the image
+            response = requests.get(image_url, timeout=30, stream=True)
+            response.raise_for_status()
+            
+            # Determine filename from URL
+            parsed_url = urlparse(image_url)
+            filename = os.path.basename(parsed_url.path) or 'image.jpg'
+            if not filename.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif')):
+                filename = f"{filename}.jpg"
+            
+            # Create the VehicleImage
+            image = VehicleImage.objects.create(
+                vehicle=vehicle,
+                is_primary=not vehicle.images.exists(),
+                display_order=vehicle.images.count(),
+                alt_text=f"{vehicle} - Imported Image"
+            )
+            
+            # Save the image file
+            image.image.save(filename, ContentFile(response.content), save=True)
+            
+            # Trigger processing
+            process_vehicle_image.delay(str(image.id))
+            
+        except requests.RequestException as e:
+            raise Exception(f"Failed to download image from {image_url}: {e}")
+
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def bulk_upload_template(self, request):
         """
@@ -363,13 +506,14 @@ class VehicleViewSet(viewsets.ModelViewSet):
         headers = [
             'vin', 'make', 'model', 'year', 'trim', 'body_type',
             'price', 'msrp', 'floor_price', 'mileage', 'transmission',
-            'fuel_type', 'exterior_color', 'interior_color', 'description', 'status'
+            'fuel_type', 'exterior_color', 'interior_color', 'description', 'status', 'image_url'
         ]
         
         sample_data = [
             '1HGCV1F34LA123456', 'Honda', 'Accord', '2025', 'EX-L', 'sedan',
             '35500.00', '37000.00', '33000.00', '15', 'automatic',
-            'gasoline', 'White Pearl', 'Black Leather', 'One owner, clean title.', 'active'
+            'gasoline', 'White Pearl', 'Black Leather', 'One owner, clean title.', 'active',
+            'https://example.com/car-image.jpg'
         ]
 
         return Response({
@@ -392,6 +536,7 @@ class VehicleViewSet(viewsets.ModelViewSet):
                 'interior_color': 'Interior color (optional)',
                 'description': 'Vehicle description (optional - check system support)',
                 'status': 'active/pending/draft (optional, default: active)',
+                'image_url': 'URL to vehicle image (optional, will be downloaded and attached)',
             }
         })
 

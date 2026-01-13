@@ -10,17 +10,47 @@ from .models import Vehicle, VehicleImage, SavedVehicle
 class VehicleImageSerializer(serializers.ModelSerializer):
     """Serializer for vehicle images."""
     image_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
+    medium_url = serializers.SerializerMethodField()
+    large_url = serializers.SerializerMethodField()
     
     class Meta:
         model = VehicleImage
         fields = [
-            'id', 'image_url', 'is_primary', 'alt_text', 'display_order'
+            'id', 'image_url', 'thumbnail_url', 'medium_url', 
+            'large_url', 'is_primary', 'alt_text', 'display_order'
         ]
     
+    def _get_absolute_url(self, field):
+        if not field:
+            return None
+        try:
+            url = field.url
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(url)
+            return url
+        except ValueError:
+            return None
+    
     def get_image_url(self, obj):
-        if obj.image:
-            return obj.image.url
-        return None
+        return self._get_absolute_url(obj.image)
+
+    def get_thumbnail_url(self, obj):
+        # Prefer generated thumbnail, fallback to legacy URL field
+        if obj.thumbnail:
+            return self._get_absolute_url(obj.thumbnail)
+        return obj.thumbnail_url
+
+    def get_medium_url(self, obj):
+        if obj.medium:
+            return self._get_absolute_url(obj.medium)
+        return obj.medium_url
+
+    def get_large_url(self, obj):
+        if obj.large:
+            return self._get_absolute_url(obj.large)
+        return obj.large_url
 
 
 class DealerMiniSerializer(serializers.Serializer):
@@ -71,12 +101,23 @@ class VehicleListSerializer(serializers.ModelSerializer):
             
         # Find primary image in list
         primary = next((img for img in images if img.is_primary), None)
+        image_field = None
         
         # Fallback to first image
         if primary and primary.image:
-            return primary.image.url
+            image_field = primary.image
         elif images[0].image:
-            return images[0].image.url
+            image_field = images[0].image
+            
+        if image_field:
+            try:
+                url = image_field.url
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(url)
+                return url
+            except ValueError:
+                return None
         return None
     
     def get_savings_from_msrp(self, obj):

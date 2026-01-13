@@ -233,9 +233,18 @@ class VehicleService:
     
     @classmethod
     def delete_image(cls, image: VehicleImage) -> None:
-        """Delete a vehicle image."""
+        """Delete a vehicle image and its files from storage."""
         was_primary = image.is_primary
         vehicle = image.vehicle
+        
+        # Delete all image files from storage
+        for field_name in ['image', 'thumbnail', 'medium', 'large']:
+            field = getattr(image, field_name)
+            if field:
+                try:
+                    field.delete(save=False)
+                except Exception:
+                    pass  # File may already be deleted
         
         image.delete()
         
