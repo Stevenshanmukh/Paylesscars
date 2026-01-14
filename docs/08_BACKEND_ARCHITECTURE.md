@@ -1,4 +1,4 @@
-# CarNegotiate - Backend Architecture
+# Payless Cars - Backend Architecture
 
 ## 1. Technology Stack
 

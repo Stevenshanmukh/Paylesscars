@@ -1,0 +1,15 @@
+Vehicle Dump:
+- 2025 Honda Accord (ID: 0bc3b89a-2522-4f57-8e6e-76aa2962c392) Status: active Price: 35500.00
+- 2025 Test Model (ID: 4c7768bf-b262-4170-9ab3-720e72a436af) Status: pending_sale Price: 35000.00
+- 2025 Test Model (ID: 1c89adf0-c6f0-40ad-b6ce-afe466479fa0) Status: pending_sale Price: 35000.00
+- 2025 TestBrand TestModel (ID: 842181b8-d916-4c21-93d5-8a584ad42885) Status: sold Price: 35000.00
+- 2024 BMW X5 (ID: 949c7607-86e7-4762-8dd2-4b43bbb6d302) Status: active Price: 65900.00
+- 2024 Tesla Model 3 (ID: bbcd26e9-08d4-43e3-8653-d6e3038719af) Status: active Price: 46500.00
+- 2023 Ford F-150 (ID: 525befdf-9fc5-4482-80ba-912a7eab670c) Status: pending_sale Price: 54500.00
+- 2024 Toyota Camry (ID: a8bd3edc-588e-4959-abfb-1665b949bcdc) Status: active Price: 29900.00
+- 2024 Honda Accord (ID: 297b340a-80db-417f-8572-50d836b16d02) Status: inactive Price: 31500.00
+
+Caught 'pending_sale' vehicle: Test Model
+Testing offer on pending vehicle (4c7768bf-b262-4170-9ab3-720e72a436af)...
+Is Valid: False
+Errors: {'vehicle_id': [ErrorDetail(string='This vehicle is not available for negotiation', code='invalid')]}

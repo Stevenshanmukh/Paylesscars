@@ -1,5 +1,5 @@
 """
-Django base settings for CarNegotiate project.
+Django base settings for Payless Cars project.
 Shared settings across all environments.
 """
 import os
@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres://postgres:postgres@localhost:5432/carnegotiate')
+    'default': env.db('DATABASE_URL', default='postgres://postgres:postgres@localhost:5432/paylesscars')
 }
 
 # Password validation
@@ -204,7 +204,7 @@ CACHES = {
 # AWS S3 Settings (for media storage)
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', default='')
 AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', default='')
-AWS_STORAGE_BUCKET_NAME = env('AWS_S3_BUCKET', default='carnegotiate-media')
+AWS_STORAGE_BUCKET_NAME = env('AWS_S3_BUCKET', default='paylesscars-media')
 AWS_S3_REGION_NAME = env('AWS_S3_REGION', default='us-east-1')
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_DEFAULT_ACL = 'public-read'
@@ -222,7 +222,7 @@ EMAIL_PORT = env.int('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@carnegotiate.com')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@paylesscars.com')
 
 # Logging Configuration
 LOGGING = {

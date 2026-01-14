@@ -1,4 +1,4 @@
-# CarNegotiate - Features & Business Logic
+# Payless Cars - Features & Business Logic
 
 ## 1. Feature Index
 

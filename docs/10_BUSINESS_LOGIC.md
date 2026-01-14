@@ -1,4 +1,4 @@
-# CarNegotiate - Business Logic & Services
+# Payless Cars - Business Logic & Services
 
 ## 1. Core Business Rules
 

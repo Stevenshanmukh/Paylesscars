@@ -1,4 +1,4 @@
-# CarNegotiate - Frontend Architecture
+# Payless Cars - Frontend Architecture
 
 ## 1. Technology Stack
 

@@ -1,6 +1,6 @@
 
 Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "  CarNegotiate Fresh Setup (Windows)" -ForegroundColor Cyan
+Write-Host "  Payless Cars Fresh Setup (Windows)" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
 $ErrorActionPreference = "Stop"
@@ -28,7 +28,7 @@ Start-Sleep -Seconds 1
 Write-Host "[OK] Processes killed" -ForegroundColor Green
 
 Write-Host "Step 2: Setting up Backend..." -ForegroundColor Yellow
-Set-Location "carnegotiate"
+Set-Location "backend"
 
 # Check Python
 try {

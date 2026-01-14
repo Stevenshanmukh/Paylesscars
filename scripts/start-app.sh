@@ -3,7 +3,7 @@
 set -e
 
 echo "=========================================="
-echo "  Starting CarNegotiate"
+echo "  Starting Payless Cars"
 echo "=========================================="
 
 # Colors
@@ -48,7 +48,7 @@ fi
 
 # Start Backend
 echo -e "${CYAN}Starting Backend on http://localhost:8000 ...${NC}"
-cd "$PROJECT_ROOT/carnegotiate"
+cd "$PROJECT_ROOT/backend"
 
 if [ -d "venv" ]; then
     source venv/bin/activate
@@ -93,7 +93,7 @@ done
 
 echo ""
 echo -e "${GREEN}=========================================="
-echo "  CarNegotiate is Running!"
+echo "  Payless Cars is Running!"
 echo "==========================================${NC}"
 echo ""
 echo -e "  ${CYAN}Frontend:${NC} http://localhost:3000"

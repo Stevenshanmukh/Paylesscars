@@ -1,4 +1,4 @@
-# How to Run CarNegotiate - Step by Step
+# How to Run Payless Cars - Step by Step
 
 ## Prerequisites Checklist
 
@@ -65,7 +65,7 @@ You need two separate terminals - one for backend, one for frontend.
 
 ```bash
 # Navigate to backend
-cd carnegotiate
+cd backend
 
 # Activate virtual environment
 # On Mac/Linux:
@@ -118,7 +118,7 @@ You should see:
 |------|-------|----------|
 | Buyer | buyer1@email.com | pass1234 |
 | Dealer | dealer1@premierauto.com | pass1234 |
-| Admin | admin@carnegotiate.com | admin |
+| Admin | admin@paylesscars.com | admin |
 
 ---
 
@@ -129,5 +129,5 @@ You should see:
 | Start everything | `.\scripts\start-app.ps1` |
 | Fresh setup | `.\scripts\fresh-setup.ps1` |
 | Install frontend deps | `cd frontend; npm install` |
-| Install backend deps | `cd carnegotiate; pip install -r requirements.txt` |
+| Install backend deps | `cd carnegotiate; pip install -r requirements/development.txt` |
 | Run migrations | `cd carnegotiate; python manage.py migrate` |

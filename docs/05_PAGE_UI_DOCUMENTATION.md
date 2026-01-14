@@ -1,4 +1,4 @@
-# CarNegotiate - Page-by-Page UI Documentation
+# Payless Cars - Page-by-Page UI Documentation
 
 ## Page Index
 

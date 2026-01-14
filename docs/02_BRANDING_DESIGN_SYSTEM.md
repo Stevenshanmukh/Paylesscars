@@ -1,4 +1,4 @@
-# CarNegotiate - Branding & Design System
+# Payless Cars - Branding & Design System
 
 ## 1. Brand Identity
 
@@ -11,7 +11,7 @@
 | **Positioning** | Premium feel with accessible pricing |
 
 ### 1.2 Logo Usage
-- Primary logo: Text-based "CarNegotiate"
+- Primary logo: Text-based "Payless Cars"
 - Icon: Stylized car silhouette (for favicon)
 - Safe space: Minimum padding equal to height of 'C'
 

@@ -1,8 +1,8 @@
-# CarNegotiate Documentation
+# Payless Cars Documentation
 
 ## Overview
 
-This documentation provides a complete, replication-grade blueprint of the CarNegotiate full-stack application. It is designed to be AI-readable and comprehensive enough for another agent to rebuild the application exactly as it exists.
+This documentation provides a complete, replication-grade blueprint of the Payless Cars full-stack application. It is designed to be AI-readable and comprehensive enough for another agent to rebuild the application exactly as it exists.
 
 ## Documentation Index
 
@@ -42,8 +42,8 @@ This documentation provides a complete, replication-grade blueprint of the CarNe
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Next.js 14, React, TypeScript, Tailwind CSS, Zustand |
-| Backend | Django 4.2+, Django REST Framework, SimpleJWT |
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS v4, Zustand |
+| Backend | Django 5, Django REST Framework, SimpleJWT |
 | Database | SQLite (dev) / PostgreSQL (prod) |
 
 ## Quick Reference

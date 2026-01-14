@@ -1,4 +1,4 @@
-# CarNegotiate - Authentication, Security & Permissions
+# Payless Cars - Authentication, Security & Permissions
 
 ## 1. Authentication Overview
 

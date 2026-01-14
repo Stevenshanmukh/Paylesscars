@@ -441,7 +441,12 @@ class VehicleViewSet(viewsets.ModelViewSet):
             'engine': row.get('engine', 'Unknown'),
             'mpg_city': row.get('mpg_city', 0),
             'mpg_highway': row.get('mpg_highway', 0),
+            'description': row.get('description', '').strip(), # Map description to specifications
         }
+
+        # Parse features (comma-separated string to list)
+        features_raw = row.get('features', '')
+        features = [f.strip() for f in features_raw.split(',') if f.strip()]
 
         return {
             'dealer': dealer,
@@ -456,10 +461,9 @@ class VehicleViewSet(viewsets.ModelViewSet):
             'msrp': msrp,
             'floor_price': floor_price,
             'specifications': specifications,
+            'features': features,
             'exterior_color': (row.get('exterior_color') or 'Unknown').strip(),
             'interior_color': (row.get('interior_color') or 'Unknown').strip(),
-            # Description is not on model, maybe put in specifications or features?
-            # Model has no description field. We'll skip or add to features.
             'status': vehicle_status,
         }
 
@@ -510,13 +514,13 @@ class VehicleViewSet(viewsets.ModelViewSet):
         headers = [
             'vin', 'make', 'model', 'year', 'trim', 'body_type',
             'price', 'msrp', 'floor_price', 'mileage', 'transmission',
-            'fuel_type', 'exterior_color', 'interior_color', 'description', 'status', 'image_url'
+            'fuel_type', 'exterior_color', 'interior_color', 'features', 'description', 'status', 'image_url'
         ]
         
         sample_data = [
             '1HGCV1F34LA123456', 'Honda', 'Accord', '2025', 'EX-L', 'sedan',
             '35500.00', '37000.00', '33000.00', '15', 'automatic',
-            'gasoline', 'White Pearl', 'Black Leather', 'One owner, clean title.', 'active',
+            'gasoline', 'White Pearl', 'Black Leather', 'Sunroof, Heated Seats, Apple CarPlay', 'One owner, clean title.', 'active',
             'https://example.com/car-image.jpg'
         ]
 
@@ -538,6 +542,7 @@ class VehicleViewSet(viewsets.ModelViewSet):
                 'fuel_type': 'gasoline/diesel/hybrid/electric/plugin_hybrid (optional, default: gasoline)',
                 'exterior_color': 'Exterior color (optional)',
                 'interior_color': 'Interior color (optional)',
+                'features': 'Comma-separated list of features (optional)',
                 'description': 'Vehicle description (optional - check system support)',
                 'status': 'active/pending/draft (optional, default: active)',
                 'image_url': 'URL to vehicle image (optional, will be downloaded and attached)',

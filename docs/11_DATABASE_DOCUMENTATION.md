@@ -1,4 +1,4 @@
-# CarNegotiate - Database Documentation
+# Payless Cars - Database Documentation
 
 ## 1. Database Overview
 

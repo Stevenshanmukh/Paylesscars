@@ -1,13 +1,13 @@
-# CarNegotiate - Application Overview & Purpose
+# Payless Cars - Application Overview & Purpose
 
 ## 1. Application Identity
 
 | Attribute | Value |
 |-----------|-------|
-| **Name** | CarNegotiate |
-| **Type** | B2B2C Car Marketplace with Negotiation System |
+| **Name** | Payless Cars |
+| **Type** | B2B2C Automotive Marketplace with Negotiation System |
 | **Version** | 1.0.0 |
-| **Tech Stack** | Next.js 14 (Frontend) + Django 4.2+ REST (Backend) |
+| **Tech Stack** | Next.js 16 (Frontend) + Django 5 REST (Backend) |
 
 ## 2. Core Problem Statement
 
@@ -17,19 +17,19 @@ Traditional car buying suffers from:
 3. **Opaque Pricing**: MSRP doesn't reflect actual market value
 4. **Time Waste**: Multiple dealership visits required
 
-**CarNegotiate Solution**: A digital marketplace where buyers can submit offers on new vehicles and negotiate directly with dealers online, with transparent pricing tiers (MSRP, asking price, floor price).
+**Payless Cars Solution**: A digital marketplace where buyers can submit offers on vehicles and negotiate directly with dealers online, with transparent pricing tiers (MSRP, asking price, floor price).
 
 ## 3. Target Users
 
 ### 3.1 Buyers (Primary)
-- **Demographics**: Adults 25-55 seeking new vehicles
+- **Demographics**: Adults 25-55 seeking vehicles
 - **Tech Level**: Comfortable with web apps, mobile-friendly
 - **Pain Points**: Dislike in-person negotiation, want transparency
 - **Goals**: Get best price with minimal stress
 
 ### 3.2 Dealers (Primary)
 - **Demographics**: Licensed car dealerships
-- **Business Model**: New car sales with negotiable margins
+- **Business Model**: Vehicle sales with negotiable margins
 - **Pain Points**: Wasted time on unqualified leads
 - **Goals**: Efficient lead conversion, inventory turnover
 
@@ -93,6 +93,7 @@ Traditional car buying suffers from:
 | Dealer Profiles | Business info, verification status |
 | Image Upload | Vehicle photos |
 | Bulk Upload | CSV import for inventory |
+| Vehicle Comparison | Compare up to 4 vehicles side-by-side |
 
 ### ❌ Out of Scope (V1)
 | Feature | Rationale |
@@ -102,7 +103,6 @@ Traditional car buying suffers from:
 | Vehicle History (Carfax) | Third-party integration |
 | Chat/Messaging | Offers include messages |
 | Mobile Apps | Responsive web only |
-| Used Vehicles | New vehicles only |
 | Multi-language | English only |
 
 ## 6. Key Constraints & Assumptions
@@ -162,7 +162,7 @@ Traditional car buying suffers from:
                          ▼
 ┌────────────────────────────────────────────────────────────────────┐
 │                    Database (SQLite/PostgreSQL)                    │
-│  Tables: accounts_user, dealers_dealer, vehicles_vehicle,         │
+│  Tables: accounts_customuser, dealers_dealer, vehicles_vehicle,   │
 │          negotiations_negotiation, negotiations_offer,            │
 │          notifications_notification, ...                          │
 └────────────────────────────────────────────────────────────────────┘
@@ -187,7 +187,7 @@ Traditional car buying suffers from:
 
 ```
 paylesscars/
-├── carnegotiate/           # Django Backend
+├── backend/           # Django Backend
 │   ├── apps/               # Django Apps
 │   │   ├── accounts/       # User authentication & profiles
 │   │   ├── dealers/        # Dealer management

@@ -3,7 +3,7 @@
 set -e  # Exit on any error
 
 echo "=========================================="
-echo "  CarNegotiate Fresh Setup"
+echo "  Payless Cars Fresh Setup"
 echo "=========================================="
 
 # Colors for output
@@ -24,7 +24,7 @@ sleep 2
 echo -e "${GREEN}✓ Processes killed${NC}"
 
 echo -e "${YELLOW}Step 2: Setting up Backend...${NC}"
-cd "$PROJECT_ROOT/carnegotiate"
+cd "$PROJECT_ROOT/backend"
 
 # Create virtual environment if not exists
 if [ ! -d "venv" ] && [ ! -d ".venv" ]; then

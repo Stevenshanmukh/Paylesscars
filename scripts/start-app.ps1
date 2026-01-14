@@ -1,6 +1,6 @@
 
 Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "  Starting CarNegotiate (Windows)" -ForegroundColor Cyan
+Write-Host "  Starting Payless Cars (Windows)" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
 $ProjectRoot = Resolve-Path "$PSScriptRoot\.."
@@ -20,7 +20,7 @@ $BackendBatch = "$ProjectRoot\scripts\start-backend.bat"
 # Using explicit python path from venv to avoid PATH issues
 $BackendContent = @"
 @echo off
-cd "$ProjectRoot\carnegotiate"
+cd "$ProjectRoot\backend"
 if exist venv\Scripts\python.exe (
     venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000
 ) else (
@@ -77,7 +77,7 @@ for ($i = 1; $i -le 60; $i++) {
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Green
-Write-Host "  CarNegotiate is Running!" -ForegroundColor Green
+Write-Host "  Payless Cars is Running!" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "  Frontend: http://localhost:3000"

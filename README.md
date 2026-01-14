@@ -1,6 +1,6 @@
-# CarNegotiate
+# Payless Cars
 
-A modern car marketplace with buyer-dealer negotiation system.
+A modern automotive marketplace with buyer-dealer negotiation system.
 
 ## Quick Start
 
@@ -14,7 +14,7 @@ A modern car marketplace with buyer-dealer negotiation system.
 ```bash
 # Clone and enter directory
 git clone <repo-url>
-cd carnegotiate
+cd paylesscars
 
 # Run setup script
 # Windows (PowerShell)
@@ -37,8 +37,8 @@ chmod +x scripts/fresh-setup.sh
 
 # Option 2: Manual startup (two terminals)
 # Terminal 1 - Backend
-cd carnegotiate
-source venv/bin/activate
+cd backend
+source venv/bin/activate  # Windows: venv\Scripts\activate
 python manage.py runserver
 
 # Terminal 2 - Frontend
@@ -70,18 +70,38 @@ See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for solutions to common problems.
 
 ```
 paylesscars/
-├── carnegotiate/        # Django REST API (Backend)
-│   ├── apps/            # Django apps
+├── backend/             # Django REST API (Backend)
+│   ├── apps/            # Django apps (accounts, dealers, vehicles, negotiations, etc.)
 │   ├── config/          # Django settings
+│   ├── core/            # Shared utilities
 │   └── manage.py
 ├── frontend/            # Next.js React app
 │   ├── src/
-│   │   ├── app/        # Pages (App Router)
-│   │   ├── components/ # React components
-│   │   └── lib/        # Utilities & API
+│   │   ├── app/         # Pages (App Router)
+│   │   ├── components/  # React components
+│   │   ├── lib/         # API client, types, utilities
+│   │   └── store/       # Zustand state management
 │   └── package.json
+├── docs/                # Technical documentation
 └── scripts/             # Utility scripts
     ├── fresh-setup.ps1  # Windows setup
     ├── start-app.ps1    # Windows startup
     └── ...              # Mac/Linux scripts
 ```
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS v4, Zustand |
+| Backend | Django 5, Django REST Framework, SimpleJWT |
+| Database | SQLite (dev) / PostgreSQL (prod) |
+
+## Documentation
+
+See the [docs/](./docs/) folder for detailed technical documentation including:
+- Application overview and features
+- Frontend/backend architecture
+- API documentation
+- Database schema
+- Authentication and security

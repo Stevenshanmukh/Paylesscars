@@ -1,5 +1,5 @@
 @echo off
-cd "C:\Users\steve\Downloads\paylesscars\carnegotiate"
+cd "C:\Users\steve\Downloads\paylesscars\backend"
 if exist venv\Scripts\python.exe (
     venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000
 ) else (

@@ -1,4 +1,4 @@
-# CarNegotiate - User Flow & Navigation Logic
+# Payless Cars - User Flow & Navigation Logic
 
 ## 1. Entry Points
 

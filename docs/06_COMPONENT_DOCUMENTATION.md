@@ -1,4 +1,4 @@
-# CarNegotiate - Component Documentation
+# Payless Cars - Component Documentation
 
 ## 1. Component Architecture
 

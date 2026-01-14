@@ -1,4 +1,4 @@
-# CarNegotiate - Base Requirements
+# Payless Cars - Base Requirements
 # Core Django dependencies shared across all environments
 
 # Django
