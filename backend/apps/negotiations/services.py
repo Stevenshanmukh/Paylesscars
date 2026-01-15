@@ -451,24 +451,54 @@ class NegotiationService:
     @classmethod
     def _notify_new_offer(cls, negotiation: Negotiation):
         """Notify dealer of new negotiation."""
-        # TODO: Implement with NotificationService
+        try:
+            from apps.notifications.services import NotificationService
+            # Get the initial offer
+            initial_offer = negotiation.offers.first()
+            if initial_offer:
+                NotificationService.notify_new_offer(negotiation, initial_offer)
+        except Exception as e:
+            # Log error but don't fail the negotiation
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send new offer notification: {e}")
     
     @classmethod
     def _notify_counter_offer(cls, negotiation: Negotiation, offer: Offer):
         """Notify other party of counter-offer."""
-        # TODO: Implement with NotificationService
+        try:
+            from apps.notifications.services import NotificationService
+            NotificationService.notify_counter_offer(negotiation, offer)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send counter-offer notification: {e}")
     
     @classmethod
     def _notify_offer_accepted(cls, negotiation: Negotiation):
         """Notify both parties of acceptance."""
-        # TODO: Implement with NotificationService
+        try:
+            from apps.notifications.services import NotificationService
+            NotificationService.notify_offer_accepted(negotiation)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send offer accepted notification: {e}")
     
     @classmethod
     def _notify_offer_rejected(cls, negotiation: Negotiation, reason: str):
         """Notify buyer of rejection."""
-        # TODO: Implement with NotificationService
+        try:
+            from apps.notifications.services import NotificationService
+            NotificationService.notify_offer_rejected(negotiation, reason)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send offer rejected notification: {e}")
     
     @classmethod
     def _notify_negotiation_cancelled(cls, negotiation: Negotiation):
         """Notify dealer of cancellation."""
-        # TODO: Implement with NotificationService
+        try:
+            from apps.notifications.services import NotificationService
+            NotificationService.notify_negotiation_cancelled(negotiation)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send cancellation notification: {e}")
+
