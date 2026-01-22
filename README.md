@@ -118,6 +118,11 @@ JWT-based authentication with role-based access control.
 
 ![Login Screen](./assets/screenshots/login.png)
 
+### 6. Real-Time Notifications
+Stay updated on every offer and counter-offer instantly.
+
+![Notifications](./assets/screenshots/notifications.png)
+
 ---
 
 ## 🛠️ Tech Stack
@@ -243,7 +248,6 @@ Comprehensive technical documentation is available in the [docs/](./docs/) direc
 - [ ] Payment integration (Stripe)
 - [ ] Vehicle history reports (Carfax API)
 - [ ] Financing calculator
-- [ ] Push notifications
 - [ ] Multi-language support
 
 ---

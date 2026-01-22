@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,8 +20,7 @@ import {
     AccordionTrigger,
 } from '@/components/ui/accordion';
 import type { VehicleFilters, BodyType } from '@/lib/types/vehicle';
-import { Search, RotateCcw, MapPin } from 'lucide-react';
-import { useDebounce } from '@/lib/hooks';
+import { Search, RotateCcw, MapPin, ChevronDown } from 'lucide-react';
 
 interface VehicleSidebarProps {
     filters: VehicleFilters;
@@ -70,25 +69,6 @@ export function VehicleSidebar({
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
     const [selectedMakes, setSelectedMakes] = useState<string[]>(filters.make ? [filters.make] : []);
     const [selectedBodyTypes, setSelectedBodyTypes] = useState<BodyType[]>(filters.bodyType ? [filters.bodyType] : []);
-
-    // Local state for search to allow debouncing
-    const [searchTerm, setSearchTerm] = useState(filters.search || '');
-    const debouncedSearch = useDebounce(searchTerm, 500);
-
-    // Sync local search when prop changes (e.g. clear all)
-    useEffect(() => {
-        if (filters.search !== debouncedSearch) {
-            setSearchTerm(filters.search || '');
-        }
-    }, [filters.search, debouncedSearch]);
-
-    // Effect to trigger filter change when debounced value changes
-    useEffect(() => {
-        // Only trigger if actual value differs from prop (to avoid loop on sync)
-        if (debouncedSearch !== filters.search) {
-            onFilterChange({ ...filters, search: debouncedSearch || undefined });
-        }
-    }, [debouncedSearch, filters, onFilterChange]);
 
     const handleMakeToggle = (make: string) => {
         const newMakes = selectedMakes.includes(make)
@@ -160,8 +140,8 @@ export function VehicleSidebar({
                 <Input
                     placeholder="Search vehicles..."
                     className="pl-9"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={filters.search || ''}
+                    onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
                 />
             </div>
 

@@ -42,7 +42,7 @@ This documentation provides a complete, replication-grade blueprint of the Payle
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS v4, Zustand |
+| Frontend | Next.js 14, React 18, TypeScript, Tailwind CSS, Zustand |
 | Backend | Django 5, Django REST Framework, SimpleJWT |
 | Database | SQLite (dev) / PostgreSQL (prod) |
 
