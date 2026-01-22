@@ -60,7 +60,7 @@ npm run dev
 curl http://localhost:8000/api/v1/health/
 
 # If not, start it
-cd carnegotiate
+cd backend
 venv\Scripts\activate
 python manage.py runserver
 ```
@@ -101,7 +101,7 @@ npm install
 
 #### Backend
 ```bash
-cd carnegotiate
+cd backend
 venv\Scripts\activate
 pip install -r requirements/development.txt
 ```

@@ -62,14 +62,7 @@ export const useVehicleStore = create<VehicleState>((set, get) => ({
     },
 
     fetchVehicle: async (id: string) => {
-        // Optimistic: Check if we already have this vehicle in the list
-        const existing = get().vehicles.find(v => v.id === id);
-        if (existing) {
-            set({ currentVehicle: existing, isLoading: true, error: null });
-        } else {
-            set({ isLoading: true, error: null });
-        }
-
+        set({ isLoading: true, error: null });
         try {
             const vehicle = await vehicleApi.get(id);
             set({ currentVehicle: vehicle, isLoading: false });

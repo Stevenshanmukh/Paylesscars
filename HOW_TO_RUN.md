@@ -129,5 +129,5 @@ You should see:
 | Start everything | `.\scripts\start-app.ps1` |
 | Fresh setup | `.\scripts\fresh-setup.ps1` |
 | Install frontend deps | `cd frontend; npm install` |
-| Install backend deps | `cd carnegotiate; pip install -r requirements/development.txt` |
-| Run migrations | `cd carnegotiate; python manage.py migrate` |
+| Install backend deps | `cd backend && pip install -r requirements/development.txt` |
+| Run migrations | `cd backend && python manage.py migrate` |

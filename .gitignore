@@ -65,3 +65,9 @@ htmlcov/
 # Debug
 debug_results.txt
 *.bak
+debug_*.py
+debug_*.txt
+test_*.py
+
+# Prompts/internal docs
+CLAUDE_CODE_PROMPT.md

@@ -93,22 +93,7 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
     },
 
     acceptOffer: async (negotiationId: string) => {
-        // Find current negotiation to revert if needed
-        const previousNegotiation = get().currentNegotiation;
-        const previousList = get().negotiations;
-
-        // Optimistic update
-        if (previousNegotiation && previousNegotiation.id === negotiationId) {
-            const optimisticallyUpdated = { ...previousNegotiation, status: 'accepted' as const, is_active: false };
-            set({
-                currentNegotiation: optimisticallyUpdated,
-                negotiations: previousList.map(n => n.id === negotiationId ? optimisticallyUpdated : n),
-                isLoading: true // Keep loading true until server confirms
-            });
-        } else {
-            set({ isLoading: true });
-        }
-
+        set({ isLoading: true, error: null });
         try {
             const updatedNegotiation = await negotiationApi.accept(negotiationId);
             set((state) => ({
@@ -119,33 +104,14 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
                 isLoading: false,
             }));
         } catch (error: unknown) {
-            // Revert on error
-            set({
-                currentNegotiation: previousNegotiation,
-                negotiations: previousList,
-                isLoading: false
-            });
             const message = error instanceof Error ? error.message : 'Failed to accept offer';
-            set({ error: message });
+            set({ error: message, isLoading: false });
             throw error;
         }
     },
 
     rejectNegotiation: async (negotiationId: string, reason?: string) => {
-        const previousNegotiation = get().currentNegotiation;
-        const previousList = get().negotiations;
-
-        if (previousNegotiation && previousNegotiation.id === negotiationId) {
-            const optimisticallyUpdated = { ...previousNegotiation, status: 'rejected' as const, is_active: false };
-            set({
-                currentNegotiation: optimisticallyUpdated,
-                negotiations: previousList.map(n => n.id === negotiationId ? optimisticallyUpdated : n),
-                isLoading: true
-            });
-        } else {
-            set({ isLoading: true });
-        }
-
+        set({ isLoading: true, error: null });
         try {
             const updatedNegotiation = await negotiationApi.reject(negotiationId, reason);
             set((state) => ({
@@ -156,32 +122,14 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
                 isLoading: false,
             }));
         } catch (error: unknown) {
-            set({
-                currentNegotiation: previousNegotiation,
-                negotiations: previousList,
-                isLoading: false
-            });
             const message = error instanceof Error ? error.message : 'Failed to reject';
-            set({ error: message });
+            set({ error: message, isLoading: false });
             throw error;
         }
     },
 
     cancelNegotiation: async (negotiationId: string) => {
-        const previousNegotiation = get().currentNegotiation;
-        const previousList = get().negotiations;
-
-        if (previousNegotiation && previousNegotiation.id === negotiationId) {
-            const optimisticallyUpdated = { ...previousNegotiation, status: 'cancelled' as const, is_active: false };
-            set({
-                currentNegotiation: optimisticallyUpdated,
-                negotiations: previousList.map(n => n.id === negotiationId ? optimisticallyUpdated : n),
-                isLoading: true
-            });
-        } else {
-            set({ isLoading: true });
-        }
-
+        set({ isLoading: true, error: null });
         try {
             const updatedNegotiation = await negotiationApi.cancel(negotiationId);
             set((state) => ({
@@ -192,13 +140,8 @@ export const useNegotiationStore = create<NegotiationState>((set, get) => ({
                 isLoading: false,
             }));
         } catch (error: unknown) {
-            set({
-                currentNegotiation: previousNegotiation,
-                negotiations: previousList,
-                isLoading: false
-            });
             const message = error instanceof Error ? error.message : 'Failed to cancel';
-            set({ error: message });
+            set({ error: message, isLoading: false });
             throw error;
         }
     },
