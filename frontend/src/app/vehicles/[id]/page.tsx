@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 // Using native img instead of Next.js Image to bypass optimization issues
-import { cn } from '@/lib/utils';
+import { cn, resolveImageUrl } from '@/lib/utils';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -145,8 +145,8 @@ export default function VehicleDetailPage() {
     const marketData = getMarketData(askingPrice);
     const { rating } = calculateDealRating(askingPrice, marketData.marketLow, marketData.marketHigh);
     const images = vehicle.images && vehicle.images.length > 0
-        ? vehicle.images
-        : [{ image: vehicle.primary_image || '/placeholder-car.jpg', image_url: vehicle.primary_image }];
+        ? vehicle.images.map(img => ({ ...img, image: resolveImageUrl(img.image) || img.image, image_url: resolveImageUrl(img.image_url) || img.image_url }))
+        : [{ image: resolveImageUrl(vehicle.primary_image) || '/placeholder-car.jpg', image_url: resolveImageUrl(vehicle.primary_image) }];
 
     const nextImage = () => {
         setActiveImageIndex((prev) => (prev + 1) % images.length);
@@ -537,7 +537,7 @@ export default function VehicleDetailPage() {
                                             <div className="relative aspect-[4/3] bg-muted">
                                                 {similar.primary_image ? (
                                                     <img
-                                                        src={similar.primary_image}
+                                                        src={resolveImageUrl(similar.primary_image) || ''}
                                                         alt={`${similar.year} ${similar.make} ${similar.model}`}
                                                         className="absolute inset-0 w-full h-full object-cover"
                                                     />

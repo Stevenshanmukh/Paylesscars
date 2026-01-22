@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { resolveImageUrl } from '@/lib/utils';
 import { Header } from '@/components/layout/Header';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from '@/components/ui/button';
@@ -151,9 +152,10 @@ function SavedVehiclesContent() {
                                 <div className="relative aspect-[4/3]">
                                     {vehicle.primary_image ? (
                                         <Image
-                                            src={vehicle.primary_image}
+                                            src={resolveImageUrl(vehicle.primary_image) || ''}
                                             alt={title}
                                             fill
+                                            unoptimized
                                             className="object-cover"
                                         />
                                     ) : (

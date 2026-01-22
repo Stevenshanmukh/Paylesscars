@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 import {
     Dialog,
@@ -21,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { formatPrice } from '@/lib/utils/formatters';
+import { resolveImageUrl } from '@/lib/utils';
 import type { Vehicle } from '@/lib/types/vehicle';
 
 const offerSchema = z.object({
@@ -44,10 +46,18 @@ export function MakeOfferModal({ isOpen, onClose, vehicle }: MakeOfferModalProps
     const askingPrice = parseFloat(vehicle.asking_price);
     const minOffer = askingPrice * 0.5; // 50% minimum per business rules
 
+    // Quick offer percentages
+    const quickOffers = [
+        { label: '5% Off', percent: 0.95 },
+        { label: '10% Off', percent: 0.90 },
+        { label: '15% Off', percent: 0.85 },
+    ];
+
     const {
         register,
         handleSubmit,
         watch,
+        setValue,
         formState: { errors },
         reset,
     } = useForm<OfferFormData>({
@@ -60,7 +70,27 @@ export function MakeOfferModal({ isOpen, onClose, vehicle }: MakeOfferModalProps
     const currentOffer = watch('amount');
     const offerAmount = parseFloat(currentOffer) || 0;
     const savings = askingPrice - offerAmount;
-    const savingsPercent = ((savings / askingPrice) * 100).toFixed(1);
+    const savingsPercent = ((savings / askingPrice) * 100);
+    const savingsPercentDisplay = savingsPercent.toFixed(1);
+
+    // Reset form when modal opens with new vehicle
+    useEffect(() => {
+        if (isOpen) {
+            reset({
+                amount: Math.round(askingPrice * 0.9).toString(),
+            });
+        }
+    }, [isOpen, askingPrice, reset]);
+
+    // Get deal rating based on offer percentage
+    const getDealRating = () => {
+        if (savingsPercent >= 15) return { label: 'Great Deal', color: 'text-green-400', bg: 'bg-green-500/20' };
+        if (savingsPercent >= 10) return { label: 'Good Deal', color: 'text-lime-400', bg: 'bg-lime-500/20' };
+        if (savingsPercent >= 5) return { label: 'Fair Deal', color: 'text-yellow-400', bg: 'bg-yellow-500/20' };
+        return { label: 'Near Asking', color: 'text-orange-400', bg: 'bg-orange-500/20' };
+    };
+
+    const dealRating = getDealRating();
 
     const onSubmit = async (data: OfferFormData) => {
         if (!isAuthenticated) {
@@ -147,81 +177,163 @@ export function MakeOfferModal({ isOpen, onClose, vehicle }: MakeOfferModalProps
         onClose();
     };
 
+    const handleQuickOffer = (percent: number) => {
+        const amount = Math.round(askingPrice * percent);
+        setValue('amount', amount.toString());
+    };
+
+    // Get primary image URL
+    const vehicleImage = vehicle.primary_image || vehicle.images?.[0]?.image || null;
+
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+            <DialogContent className="bg-card border-border text-card-foreground max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="text-xl">Make an Offer</DialogTitle>
-                    <DialogDescription className="text-slate-400">
-                        {vehicle.year} {vehicle.make} {vehicle.model} {vehicle.trim}
-                    </DialogDescription>
+                    {/* Vehicle Image + Title */}
+                    <div className="flex items-start gap-4">
+                        {vehicleImage && (
+                            <div className="relative w-20 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-border">
+                                <Image
+                                    src={resolveImageUrl(vehicleImage)}
+                                    alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                />
+                            </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <DialogTitle className="text-xl">Make an Offer</DialogTitle>
+                            <DialogDescription className="text-muted-foreground truncate">
+                                {vehicle.year} {vehicle.make} {vehicle.model} {vehicle.trim}
+                            </DialogDescription>
+                        </div>
+                    </div>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="space-y-6 py-4">
+                    <div className="space-y-5 py-4">
                         {/* Current Price */}
-                        <div className="bg-slate-700/50 rounded-lg p-4">
+                        <div className="bg-muted/50 rounded-lg p-4">
                             <div className="flex justify-between items-center">
-                                <span className="text-slate-400">Asking Price</span>
-                                <span className="text-xl font-bold text-white">
+                                <span className="text-muted-foreground">Asking Price</span>
+                                <span className="text-xl font-bold text-foreground price">
                                     {formatPrice(vehicle.asking_price)}
                                 </span>
                             </div>
                         </div>
 
+                        {/* Quick Offer Buttons */}
+                        <div className="space-y-2">
+                            <Label className="text-muted-foreground text-sm">Quick Select</Label>
+                            <div className="flex gap-2">
+                                {quickOffers.map((offer, i) => {
+                                    const offerValue = Math.round(askingPrice * offer.percent);
+                                    const isSelected = currentOffer === offerValue.toString();
+                                    return (
+                                        <Button
+                                            key={i}
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            className={`flex-1 flex-col h-auto py-2 ${isSelected
+                                                ? 'border-primary bg-primary/10 text-primary'
+                                                : 'border-input hover:border-primary/50'
+                                                }`}
+                                            onClick={() => handleQuickOffer(offer.percent)}
+                                        >
+                                            <span className="text-xs font-medium">{offer.label}</span>
+                                            <span className="text-sm font-bold">{formatPrice(offerValue)}</span>
+                                        </Button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
                         {/* Offer Input */}
                         <div className="space-y-2">
-                            <Label htmlFor="amount" className="text-slate-200">Your Offer</Label>
+                            <Label htmlFor="amount" className="text-foreground">Your Offer</Label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">$</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-lg">$</span>
                                 <Input
                                     id="amount"
                                     type="number"
-                                    className="pl-8 text-lg bg-slate-700/50 border-slate-600 text-white h-12"
+                                    className="pl-8 text-lg bg-muted/50 border-input text-foreground h-12"
                                     {...register('amount')}
                                 />
                             </div>
                             {errors.amount && (
-                                <p className="text-sm text-red-400">{errors.amount.message}</p>
+                                <p className="text-sm text-destructive">{errors.amount.message}</p>
                             )}
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-muted-foreground">
                                 Minimum offer: {formatPrice(minOffer)}
                             </p>
                         </div>
 
-                        {/* Savings Calculator */}
+                        {/* Savings Calculator with Progress Bar */}
                         {offerAmount > 0 && offerAmount < askingPrice && (
-                            <div className="bg-green-900/30 border border-green-800 rounded-lg p-4">
-                                <div className="flex justify-between items-center text-green-400">
-                                    <span>Potential Savings</span>
-                                    <span className="font-bold">
-                                        {formatPrice(savings)} ({savingsPercent}%)
+                            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                        <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span className="text-green-400 font-medium">Potential Savings</span>
+                                    </div>
+                                    <span className="font-bold text-green-400">
+                                        {formatPrice(savings)} ({savingsPercentDisplay}%)
                                     </span>
+                                </div>
+                                {/* Progress Bar */}
+                                <div className="w-full bg-green-900/30 rounded-full h-2 overflow-hidden">
+                                    <div
+                                        className="bg-green-400 h-full rounded-full transition-all duration-300 ease-out"
+                                        style={{ width: `${Math.min(savingsPercent * 2, 100)}%` }}
+                                    />
+                                </div>
+                                {/* Deal Rating Badge */}
+                                <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${dealRating.bg} ${dealRating.color}`}>
+                                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    {dealRating.label}
                                 </div>
                             </div>
                         )}
 
-                        <Separator className="bg-slate-700" />
+                        {/* Warning if offer is too low */}
+                        {offerAmount > 0 && offerAmount < minOffer && (
+                            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 flex items-start gap-2">
+                                <svg className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <p className="text-sm text-destructive">
+                                    Offer must be at least {formatPrice(minOffer)} (50% of asking price)
+                                </p>
+                            </div>
+                        )}
+
+                        <Separator className="bg-border" />
 
                         {/* Message */}
                         <div className="space-y-2">
-                            <Label htmlFor="message" className="text-slate-200">
-                                Message to Dealer <span className="text-slate-500">(optional)</span>
+                            <Label htmlFor="message" className="text-foreground">
+                                Message to Dealer <span className="text-muted-foreground">(optional)</span>
                             </Label>
                             <textarea
                                 id="message"
                                 rows={3}
-                                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-md text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 bg-muted/50 border border-input rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                                 placeholder="e.g., I'm a serious buyer ready to purchase this week..."
                                 {...register('message')}
                             />
                             {errors.message && (
-                                <p className="text-sm text-red-400">{errors.message.message}</p>
+                                <p className="text-sm text-destructive">{errors.message.message}</p>
                             )}
                         </div>
 
                         {/* Info */}
-                        <div className="flex items-start gap-2 text-sm text-slate-400">
+                        <div className="flex items-start gap-2 text-sm text-muted-foreground">
                             <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -237,14 +349,14 @@ export function MakeOfferModal({ isOpen, onClose, vehicle }: MakeOfferModalProps
                             type="button"
                             variant="outline"
                             onClick={handleClose}
-                            className="border-slate-600 text-slate-300"
+                            className="border-input text-muted-foreground hover:text-foreground"
                         >
                             Cancel
                         </Button>
                         <Button
                             type="submit"
-                            className="bg-blue-600 hover:bg-blue-700"
-                            disabled={isSubmitting}
+                            className="bg-primary hover:bg-primary/90"
+                            disabled={isSubmitting || offerAmount < minOffer}
                         >
                             {isSubmitting ? 'Submitting...' : 'Submit Offer'}
                         </Button>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { cn, resolveImageUrl } from '@/lib/utils';
 import { Header } from '@/components/layout/Header';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -223,10 +223,11 @@ function BuyerDashboardContent() {
                                                         {/* Vehicle Image */}
                                                         <div className="w-20 h-14 bg-muted rounded-lg overflow-hidden flex-shrink-0 hidden sm:block">
                                                             <Image
-                                                                src={neg.vehicle?.primary_image || '/placeholder-car.jpg'}
+                                                                src={resolveImageUrl(neg.vehicle?.primary_image) || '/placeholder-car.jpg'}
                                                                 alt={neg.vehicle?.title || 'Vehicle'}
                                                                 width={80}
                                                                 height={56}
+                                                                unoptimized
                                                                 className="w-full h-full object-cover"
                                                             />
                                                         </div>
@@ -303,9 +304,10 @@ function BuyerDashboardContent() {
                                                 <div className="w-16 h-12 bg-muted rounded overflow-hidden flex-shrink-0 relative">
                                                     {vehicle.primary_image ? (
                                                         <Image
-                                                            src={vehicle.primary_image}
+                                                            src={resolveImageUrl(vehicle.primary_image) || ''}
                                                             alt={title}
                                                             fill
+                                                            unoptimized
                                                             className="object-cover"
                                                         />
                                                     ) : (

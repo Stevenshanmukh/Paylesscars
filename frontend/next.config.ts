@@ -12,7 +12,6 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  /*
   experimental: {
     optimizePackageImports: [
       'lucide-react',
@@ -26,23 +25,20 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-tabs'
     ],
   },
-  */
 
   images: {
     remotePatterns: [
       {
-        // Explicitly allow Django backend images on localhost
         protocol: 'http',
         hostname: 'localhost',
-        port: '8000',
-        pathname: '/media/**',
+        port: '',
+        pathname: '/**',
       },
       {
-        // Also allow 127.0.0.1
         protocol: 'http',
         hostname: '127.0.0.1',
-        port: '8000',
-        pathname: '/media/**',
+        port: '',
+        pathname: '/**',
       },
       {
         protocol: 'https',

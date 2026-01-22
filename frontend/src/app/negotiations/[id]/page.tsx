@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { resolveImageUrl } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -234,9 +235,10 @@ function NegotiationDetailContent() {
                                         {currentNegotiation.vehicle.primary_image ? (
                                             <div className="relative w-full h-full">
                                                 <Image
-                                                    src={currentNegotiation.vehicle.primary_image}
+                                                    src={resolveImageUrl(currentNegotiation.vehicle.primary_image) || ''}
                                                     alt={currentNegotiation.vehicle.title}
                                                     fill
+                                                    unoptimized
                                                     className="object-cover"
                                                 />
                                             </div>
@@ -392,6 +394,7 @@ function NegotiationDetailContent() {
                 <CounterOfferModal
                     isOpen={showCounterModal}
                     onClose={() => setShowCounterModal(false)}
+                    onSuccess={() => fetchNegotiation(params.id as string)}
                     negotiationId={currentNegotiation.id}
                     vehicleTitle={currentNegotiation.vehicle.title}
                     askingPrice={currentNegotiation.vehicle.asking_price}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { cn, resolveImageUrl } from '@/lib/utils';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -194,10 +194,11 @@ function DealerOffersContent() {
                                                 {/* Vehicle Image */}
                                                 <div className="w-24 h-18 bg-muted rounded-lg overflow-hidden flex-shrink-0 hidden sm:block">
                                                     <Image
-                                                        src={negotiation.vehicle?.primary_image || '/placeholder-car.jpg'}
+                                                        src={resolveImageUrl(negotiation.vehicle?.primary_image) || '/placeholder-car.jpg'}
                                                         alt={negotiation.vehicle?.title || 'Vehicle'}
                                                         width={96}
                                                         height={72}
+                                                        unoptimized
                                                         className="w-full h-full object-cover"
                                                     />
                                                 </div>

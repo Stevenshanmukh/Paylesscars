@@ -17,7 +17,7 @@ import { formatPrice } from '@/lib/utils/formatters';
 import { vehicleApi } from '@/lib/api/vehicles';
 import type { Vehicle } from '@/lib/types/vehicle';
 import { ArrowLeft, GitCompare, X, Check, Minus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, resolveImageUrl } from '@/lib/utils';
 
 // Helper to generate market data
 function getMarketData(askingPrice: number) {
@@ -201,7 +201,7 @@ function CompareContent() {
                                     const askingPrice = parseFloat(vehicle.asking_price);
                                     const marketData = getMarketData(askingPrice);
                                     const { rating } = calculateDealRating(askingPrice, marketData.marketLow, marketData.marketHigh);
-                                    const primaryImage = vehicle.images?.[0]?.image || vehicle.primary_image || '/placeholder-car.jpg';
+                                    const primaryImage = resolveImageUrl(vehicle.images?.[0]?.image_url || vehicle.primary_image) || '/placeholder-car.jpg';
 
                                     return (
                                         <th key={vehicle.id} className="p-2 align-top border-b border-border">
@@ -220,6 +220,7 @@ function CompareContent() {
                                                         src={primaryImage}
                                                         alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                                                         fill
+                                                        unoptimized
                                                         className="object-cover"
                                                     />
                                                     <div className="absolute top-2 left-2">

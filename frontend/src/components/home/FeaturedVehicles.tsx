@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { cn, resolveImageUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DealBadge } from '@/components/ui/deal-badge';
@@ -156,7 +156,7 @@ export function FeaturedVehicles({ className }: FeaturedVehiclesProps) {
                     <div
                         ref={scrollRef}
                         onScroll={checkScroll}
-                        className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+                        className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory px-4 md:px-0"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         {vehicles.map((vehicle) => {
@@ -171,14 +171,15 @@ export function FeaturedVehicles({ className }: FeaturedVehiclesProps) {
                                     href={`/vehicles/${vehicle.id}`}
                                     className="flex-shrink-0 w-[300px] snap-start"
                                 >
-                                    <div className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border">
+                                    <div className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border h-full flex flex-col">
                                         {/* Image */}
-                                        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                                        <div className="relative aspect-[4/3] overflow-hidden bg-muted flex-shrink-0">
                                             {vehicle.primary_image ? (
                                                 <Image
-                                                    src={vehicle.primary_image}
+                                                    src={resolveImageUrl(vehicle.primary_image) || ''}
                                                     alt={title}
                                                     fill
+                                                    unoptimized
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                                 />
                                             ) : (
@@ -203,31 +204,33 @@ export function FeaturedVehicles({ className }: FeaturedVehiclesProps) {
                                         </div>
 
                                         {/* Content */}
-                                        <div className="p-4">
-                                            {/* Title */}
-                                            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                                                {title}
-                                            </h3>
-                                            <p className="text-sm text-muted-foreground">{vehicle.trim}</p>
+                                        <div className="p-4 flex flex-col flex-grow">
+                                            <div className="flex-grow">
+                                                {/* Title */}
+                                                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                                                    {title}
+                                                </h3>
+                                                <p className="text-sm text-muted-foreground">{vehicle.trim}</p>
 
-                                            {/* Price */}
-                                            <div className="mt-3 flex items-baseline gap-2">
-                                                <span className="text-xl font-bold text-foreground price">
-                                                    ${askingPrice.toLocaleString()}
-                                                </span>
-                                                {msrpPrice > askingPrice && (
-                                                    <span className="text-sm text-muted-foreground line-through">
-                                                        ${msrpPrice.toLocaleString()}
+                                                {/* Price */}
+                                                <div className="mt-3 flex items-baseline gap-2">
+                                                    <span className="text-xl font-bold text-foreground price">
+                                                        ${askingPrice.toLocaleString()}
                                                     </span>
+                                                    {msrpPrice > askingPrice && (
+                                                        <span className="text-sm text-muted-foreground line-through">
+                                                            ${msrpPrice.toLocaleString()}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {/* Dealer */}
+                                                {vehicle.dealer && (
+                                                    <p className="text-xs text-muted-foreground mt-2 line-clamp-1">
+                                                        {vehicle.dealer.business_name} • {vehicle.dealer.city}, {vehicle.dealer.state}
+                                                    </p>
                                                 )}
                                             </div>
-
-                                            {/* Dealer */}
-                                            {vehicle.dealer && (
-                                                <p className="text-xs text-muted-foreground mt-2">
-                                                    {vehicle.dealer.business_name} • {vehicle.dealer.city}, {vehicle.dealer.state}
-                                                </p>
-                                            )}
 
                                             {/* CTA */}
                                             <Button className="w-full mt-4" size="sm">

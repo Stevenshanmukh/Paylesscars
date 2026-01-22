@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { cn, resolveImageUrl } from '@/lib/utils';
 import { Header } from '@/components/layout/Header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -164,10 +164,11 @@ function NegotiationsContent() {
                                                     <div className="w-24 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0 hidden sm:block">
                                                         {negotiation.vehicle.primary_image ? (
                                                             <Image
-                                                                src={negotiation.vehicle.primary_image}
+                                                                src={resolveImageUrl(negotiation.vehicle.primary_image) || ''}
                                                                 alt={negotiation.vehicle.title}
                                                                 width={96}
                                                                 height={64}
+                                                                unoptimized
                                                                 className="w-full h-full object-cover"
                                                             />
                                                         ) : (
