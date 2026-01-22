@@ -76,13 +76,18 @@ function SavedVehiclesContent() {
     }, []);
 
     const handleRemove = async (vehicleId: string) => {
+        // Optimistic update - remove immediately
+        const previousVehicles = savedVehicles;
+        setSavedVehicles(prev => prev.filter(sv => sv.vehicle.id !== vehicleId));
+        toast.success('Vehicle removed from saved');
+
         try {
             await vehicleApi.removeSaved(vehicleId);
-            setSavedVehicles(prev => prev.filter(sv => sv.vehicle.id !== vehicleId));
-            toast.success('Vehicle removed from saved');
         } catch (err) {
             console.error('Failed to remove vehicle:', err);
             toast.error('Failed to remove vehicle');
+            // Revert on failure
+            setSavedVehicles(previousVehicles);
         }
     };
 
@@ -121,11 +126,9 @@ function SavedVehiclesContent() {
                 <EmptyState
                     icon={Heart}
                     title="No saved vehicles"
-                    description="When you find vehicles you like, click the heart icon to save them for later."
-                    action={{
-                        label: "Browse Vehicles",
-                        onClick: () => window.location.href = '/vehicles'
-                    }}
+                    message="When you find vehicles you like, click the heart icon to save them for later."
+                    actionLabel="Browse Vehicles"
+                    onAction={() => window.location.href = '/vehicles'}
                 />
             )}
 

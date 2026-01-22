@@ -194,7 +194,7 @@ export function MakeOfferModal({ isOpen, onClose, vehicle }: MakeOfferModalProps
                         {vehicleImage && (
                             <div className="relative w-20 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-border">
                                 <Image
-                                    src={resolveImageUrl(vehicleImage)}
+                                    src={resolveImageUrl(vehicleImage) || ''}
                                     alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                                     fill
                                     className="object-cover"
@@ -356,9 +356,10 @@ export function MakeOfferModal({ isOpen, onClose, vehicle }: MakeOfferModalProps
                         <Button
                             type="submit"
                             className="bg-primary hover:bg-primary/90"
-                            disabled={isSubmitting || offerAmount < minOffer}
+                            isLoading={isSubmitting}
+                            disabled={offerAmount < minOffer}
                         >
-                            {isSubmitting ? 'Submitting...' : 'Submit Offer'}
+                            Submit Offer
                         </Button>
                     </DialogFooter>
                 </form>
