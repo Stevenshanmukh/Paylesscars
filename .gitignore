@@ -21,21 +21,47 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+venv/
+.venv/
+env/
+*.pyc
 
 # Django
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media
+media/
 
-# Node.js
+# Node.js / Next.js
 node_modules/
 npm-debug.log
 yarn-error.log
+.next/
+out/
+.turbo/
+
+# Environment
 .env
+.env.local
+.env.*.local
+
+# OS
 .DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Debug
+debug_results.txt
+*.bak
